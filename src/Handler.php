@@ -11,23 +11,23 @@
 namespace Manticoresearch\Buddy\Plugin\ShowFields;
 
 use Manticoresearch\Buddy\Core\ManticoreSearch\Client as HTTPClient;
-use Manticoresearch\Buddy\Core\Plugin\Executor as BaseExecutor;
+use Manticoresearch\Buddy\Core\Plugin\BaseHandler;
 use Manticoresearch\Buddy\Core\Task\Task;
 use Manticoresearch\Buddy\Core\Task\TaskResult;
 use RuntimeException;
 use parallel\Runtime;
 
-final class Executor extends BaseExecutor {
+final class Handler extends BaseHandler {
   /** @var HTTPClient $manticoreClient */
 	protected HTTPClient $manticoreClient;
 
 	/**
 	 * Initialize the executor
 	 *
-	 * @param Request $request
+	 * @param Payload $payload
 	 * @return void
 	 */
-	public function __construct(public Request $request) {
+	public function __construct(public Payload $payload) {
 	}
 
   /**
@@ -37,10 +37,10 @@ final class Executor extends BaseExecutor {
 	 * @throws RuntimeException
 	 */
 	public function run(Runtime $runtime): Task {
-		$this->manticoreClient->setPath($this->request->path);
+		$this->manticoreClient->setPath($this->payload->path);
 
-		$taskFn = static function (Request $request, HTTPClient $manticoreClient): TaskResult {
-			$query = "desc {$request->table}";
+		$taskFn = static function (Payload $payload, HTTPClient $manticoreClient): TaskResult {
+			$query = "desc {$payload->table}";
 			/** @var array<array{data:array<array{Field:string,Type:string}>}> */
 			$descResult = $manticoreClient->sendRequest($query)->getResult();
 			$data = [];
@@ -91,7 +91,7 @@ final class Executor extends BaseExecutor {
 		};
 
 		return Task::createInRuntime(
-			$runtime, $taskFn, [$this->request, $this->manticoreClient]
+			$runtime, $taskFn, [$this->payload, $this->manticoreClient]
 		)->run();
 	}
 

@@ -11,20 +11,20 @@
 namespace Manticoresearch\Buddy\Plugin\ShowFields;
 
 use Manticoresearch\Buddy\Core\Error\QueryParseError;
-use Manticoresearch\Buddy\Core\Network\Request as NetworkRequest;
-use Manticoresearch\Buddy\Core\Plugin\Request as BaseRequest;
+use Manticoresearch\Buddy\Core\Network\Request;
+use Manticoresearch\Buddy\Core\Plugin\BasePayload;
 
-final class Request extends BaseRequest {
+final class Payload extends BasePayload {
 	public string $path;
 
 	public function __construct(public string $table) {
 	}
 
   /**
-	 * @param NetworkRequest $request
+	 * @param Request $request
 	 * @return static
 	 */
-	public static function fromNetworkRequest(NetworkRequest $request): static {
+	public static function fromRequest(Request $request): static {
 		$pattern = '#show fields from'
 			. '\s+`?(?P<table>([a-z][a-z0-9\_]*))`?'
 			. '$#ius';
@@ -38,10 +38,10 @@ final class Request extends BaseRequest {
 	}
 
 	/**
-	 * @param NetworkRequest $request
+	 * @param Request $request
 	 * @return bool
 	 */
-	public static function hasMatch(NetworkRequest $request): bool {
+	public static function hasMatch(Request $request): bool {
 		return stripos($request->payload, 'show fields') === 0;
 	}
 }
