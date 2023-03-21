@@ -12,6 +12,7 @@ namespace Manticoresearch\Buddy\Plugin\ShowFields;
 
 use Manticoresearch\Buddy\Core\ManticoreSearch\Client as HTTPClient;
 use Manticoresearch\Buddy\Core\Plugin\BaseHandler;
+use Manticoresearch\Buddy\Core\Task\Column;
 use Manticoresearch\Buddy\Core\Task\Task;
 use Manticoresearch\Buddy\Core\Task\TaskResult;
 use RuntimeException;
@@ -57,37 +58,13 @@ final class Handler extends BaseHandler {
 				];
 			}
 
-			return new TaskResult(
-				[[
-					'total' => sizeof($data),
-					'error' => '',
-					'warning' => '',
-					'columns' => [
-						[
-							'Field' => [
-								'type' => 'string',
-							],
-							'Type' => [
-								'type' => 'string',
-							],
-							'Null' => [
-								'type' => 'string',
-							],
-							'Key' => [
-								'type' => 'string',
-							],
-							'Default' => [
-								'type' => 'string',
-							],
-							'Extra' => [
-								'type' => 'string',
-							],
-						],
-					],
-					'data' => array_values($data),
-				],
-				]
-			);
+			return TaskResult::withData($data)
+				->column('Field', Column::String)
+				->column('Type', Column::String)
+				->column('Null', Column::String)
+				->column('Key', Column::String)
+				->column('Default', Column::String)
+				->column('Extra', Column::String);
 		};
 
 		return Task::createInRuntime(
