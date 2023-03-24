@@ -26,7 +26,7 @@ final class Payload extends BasePayload {
 	 */
 	public static function fromRequest(Request $request): static {
 		$pattern = '#show fields from'
-			. '\s+`?(?P<table>([a-z][a-z0-9\_]*))`?'
+			. '\s+`?(?P<table>([^\ ]*))`?'
 			. '$#ius';
 		if (!preg_match($pattern, $request->payload, $m)) {
 			throw QueryParseError::create('You have an error in your query. Please, double-check it.');

@@ -42,8 +42,13 @@ final class Handler extends BaseHandler {
 
 		$taskFn = static function (Payload $payload, HTTPClient $manticoreClient): TaskResult {
 			$query = "desc {$payload->table}";
-			/** @var array<array{data:array<array{Field:string,Type:string}>}> */
+			/** @var array{error?:string} */
 			$descResult = $manticoreClient->sendRequest($query)->getResult();
+			if (isset($descResult['error'])) {
+				return TaskResult::withError($descResult['error']);
+			}
+
+			/** @var array<array{data:array<array{Field:string,Type:string}>}> $descResult */
 			$data = [];
 			foreach ($descResult[0]['data'] as $row) {
 				// Sometimes we can have two rows for same field
